@@ -3,6 +3,8 @@ from .models import *
 from django.utils.crypto import get_random_string
 from django.utils import timezone
 from django.core.mail import send_mail
+from rest_framework import serializers
+from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
 
@@ -53,6 +55,15 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+
+
+
 class OTPVerificationSerializer(serializers.Serializer):
     email = serializers.EmailField()
     otp = serializers.CharField(max_length=6)
@@ -76,3 +87,21 @@ class OTPVerificationSerializer(serializers.Serializer):
         user.otp_created_at = None  # Clear OTP created time
         user.save()
         return user
+
+
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(required=True)
+    new_password = serializers.CharField(required=True, validators=[validate_password])
+
+    def validate_old_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is not correct")
+        return value
+
+    def validate(self, attrs):
+        if attrs['old_password'] == attrs['new_password']:
+            raise serializers.ValidationError("New password must be different from the old password.")
+        return attrs

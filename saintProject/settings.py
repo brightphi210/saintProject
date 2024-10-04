@@ -20,6 +20,9 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
+
+# SITE_ID = 1
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -31,8 +34,25 @@ INSTALLED_APPS = [
     'saintApp',
     'drf_yasg',
     'rest_framework_simplejwt',
+
+    # 'django.contrib.sites',
+    # 'allauth',
+    # 'allauth.account',
+    # 'allauth.socialaccount',
+    # 'allauth.socialaccount.providers.google'
 ]
 
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google' : {
+#         "SCOPE" : [
+#             'profile',
+#             'email'
+#         ],
+
+#         'AUTH_PARAMS' : {'access_type' : 'online'}
+#     }
+# }
 
 AUTH_USER_MODEL = 'saintApp.User'
 
@@ -198,3 +218,4 @@ EMAIL_HOST_USER = 'welearn562@gmail.com'
 EMAIL_HOST_PASSWORD = 'eptlhyaggacobdxu'
 DEFAULT_FROM_USER = 'welearn562@gmail.com'
 SERVER_EMAIL =  'welearn562@gmail.com'
+EMAIL_TIMEOUT = 60
