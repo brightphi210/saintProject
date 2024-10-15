@@ -55,6 +55,7 @@ INSTALLED_APPS = [
 # }
 
 AUTH_USER_MODEL = 'saintApp.User'
+CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
