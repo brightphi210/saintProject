@@ -4,6 +4,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import *
+from rest_framework.views import APIView
 
 # Create your views here.
 
@@ -56,3 +57,13 @@ class ChangePasswordView(APIView):
         request.user.save()
 
         return Response({"message": "Password changed successfully"}, status=status.HTTP_200_OK)
+    
+
+
+class ResendOTPView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = ResendOTPSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.resend_otp()  # Call the method to resend OTP
+            return Response({"detail": "OTP has been resent successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

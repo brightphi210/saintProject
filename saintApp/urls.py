@@ -7,4 +7,5 @@ urlpatterns = [
     path('user-profile/update/<str:pk>/', views.UserProfileUpdateView.as_view(), name='user-profile-update'),
     path('verify-otp/', views.OTPVerificationView.as_view(), name='otp-verify'),
     path('change-password/', views.ChangePasswordView.as_view(), name='change_password'),
+    path('resend-otp/', views.ResendOTPView.as_view(), name='resend-otp'),
 ]

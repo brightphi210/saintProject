@@ -56,6 +56,45 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
+
+class ResendOTPSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    def validate_email(self, value):
+        try:
+            user = User.objects.get(email=value)
+        except User.DoesNotExist:
+            raise serializers.ValidationError("User with this email does not exist.")
+        
+        if user.otp_created_at and (timezone.now() - user.otp_created_at).seconds < 60:
+            raise serializers.ValidationError("You can only request a new OTP after 1 minute.")
+        
+        return value
+
+    def resend_otp(self):
+        email = self.validated_data['email']
+        user = User.objects.get(email=email)
+
+        # Generate a new OTP and update the user model
+        otp = get_random_string(length=6, allowed_chars='0123456789')
+        user.otp = otp
+        user.otp_created_at = timezone.now()
+        user.save()
+
+        # Send OTP via email
+        self.send_otp(user.email, otp)
+
+    def send_otp(self, email, otp):
+        send_mail(
+            'Resend OTP - Codex Christi',
+            f'Please verify your email with the new OTP: {otp}',
+            'bmpinovations@gmail.com',
+            [email],
+            fail_silently=False,
+        )
+
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
