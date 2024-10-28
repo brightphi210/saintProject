@@ -145,19 +145,19 @@ WSGI_APPLICATION = 'saintProject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
 
 
 import dj_database_url
 
-DATABASES = {
-    'default' : dj_database_url.parse('postgresql://codex_cx50_user:edEx8kAqal2kZDNf98sgpPaSNnzB5wsv@dpg-crq0o63tq21c73d94obg-a.oregon-postgres.render.com/codex_cx50')
-}
+# DATABASES = {
+#     'default' : dj_database_url.parse('postgresql://codex_cx50_user:edEx8kAqal2kZDNf98sgpPaSNnzB5wsv@dpg-crq0o63tq21c73d94obg-a.oregon-postgres.render.com/codex_cx50')
+# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

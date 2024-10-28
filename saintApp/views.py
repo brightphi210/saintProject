@@ -67,3 +67,51 @@ class ResendOTPView(APIView):
             serializer.resend_otp()  # Call the method to resend OTP
             return Response({"detail": "OTP has been resent successfully."}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+from .utils import generate_password_reset_link
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            try:
+                user = User.objects.get(email=email)
+                reset_link = generate_password_reset_link(user, request)
+                # Send the email
+                send_mail(
+                    subject='Password Reset Request',
+                    message=f'Click the link to reset your password: {reset_link}',
+                    from_email='bmpinovations@gmail.com',
+                    recipient_list=[email],
+                )
+                return Response({'detail': 'Password reset link sent.'}, status=status.HTTP_200_OK)
+            except User.DoesNotExist:
+                return Response({'detail': 'User with this email does not exist.'}, status=status.HTTP_404_NOT_FOUND)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
+class PasswordResetConfirmView(generics.UpdateAPIView):
+    serializer_class = PasswordResetSerializer
+
+    def post(self, request, uidb64, token):
+        try:
+            uid = urlsafe_base64_decode(uidb64).decode()
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user and default_token_generator.check_token(user, token):
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid():
+                user.set_password(serializer.validated_data['new_password'])
+                user.save()
+                return Response({'detail': 'Password has been reset.'}, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'detail': 'Invalid token.'}, status=status.HTTP_400_BAD_REQUEST)

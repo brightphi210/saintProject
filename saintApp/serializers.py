@@ -8,7 +8,6 @@ from django.contrib.auth.password_validation import validate_password
 
 class UserSerializer(serializers.ModelSerializer):
 
-
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -144,3 +143,12 @@ class ChangePasswordSerializer(serializers.Serializer):
         if attrs['old_password'] == attrs['new_password']:
             raise serializers.ValidationError("New password must be different from the old password.")
         return attrs
+
+
+
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True, min_length=8)
