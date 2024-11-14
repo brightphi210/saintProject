@@ -5,9 +5,11 @@ from django.utils import timezone
 from django.core.mail import send_mail
 from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-class UserSerializer(serializers.ModelSerializer):
 
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -15,11 +17,18 @@ class UserSerializer(serializers.ModelSerializer):
         # Add custom claims
         token['name'] = user.name
         token['email'] = user.email
-        profile = UserProfile.objects.get(user=user)
-        token['profile_id'] = profile.id
-        token['profile_pic'] = profile.profile_pic
+
+        try:
+            profile = UserProfile.objects.get(user=user)
+            token['username'] = profile.username
+
+        except UserProfile.DoesNotExist:
+             token['username'] = None
+
         return token
 
+
+class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
